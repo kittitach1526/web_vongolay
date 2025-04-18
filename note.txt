@@ -1,4 +1,0 @@
-/admin  สำหรับจัดการสมาชิกหลัก
-/admin_submember สำหรับจัดการสมาชิกรอง
-/login สำหรับเข้าถึงหลังบ้าน แล้วเลือกจัดการสมาชิก 
-username : admin password : vongolay
