@@ -1,0 +1,11 @@
+https://vongolay.pythonanywhere.com/admin  สำหรับจัดการสมาชิกหลัก
+https://vongolay.pythonanywhere.com/admin_submember สำหรับจัดการสมาชิกรอง
+https://vongolay.pythonanywhere.com/login สำหรับเข้าถึงหลังบ้าน แล้วเลือกจัดการสมาชิก 
+
+username : admin password : vongolay
+
+python anywhere :
+
+e-mail : ayakirika06@gmail.com
+
+password : adminvongolay 

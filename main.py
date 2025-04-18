@@ -15,24 +15,22 @@ admin_query = Query()
 
 
 # หน้า login
+from flask import session, redirect, url_for, request, render_template
+from tinydb import TinyDB, Query
+
+db = TinyDB('db.json')
+User = Query()
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        # ค้นหาข้อมูลที่ username เป็น 'admin'
-        result = admin_db.search(User.username == username)
-        print(result)
-        for user in result:
-            print(user['username'])
-            print(user['password'])
 
-            user_to_check = user['username']
-            password_to_check = user['password']
+        # ✅ ดึง user จาก TinyDB
+        user = admin_db.search((User.username == username) & (User.password == password))
 
-
-        # เปลี่ยนตรงนี้ให้เป็นรหัสจริงที่คุณต้องการใช้
-        if username == user_to_check and password == password_to_check:
+        if user:
             session['logged_in'] = True
             return redirect(url_for('select'))
         else:
@@ -144,4 +142,4 @@ def search():
 
     return render_template("search.html", results=results)
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0')
