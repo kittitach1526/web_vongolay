@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ค้นหาสมาชิก</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #000;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+
+        #snow-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        .card {
+            background-color: rgba(33, 33, 33, 0.85);
+            border: none;
+            border-radius: 15px;
+        }
+
+        .form-control,
+        .btn {
+            border-radius: 10px;
+        }
+
+        .img-thumbnail {
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- หิมะ -->
+    <canvas id="snow-canvas"></canvas>
+
+    <div class="container py-5 content-wrapper">
+        <h1 class="text-center mb-4">🔍 ค้นหาสมาชิก</h1>
+
+        <form method="POST" class="mb-4">
+            <div class="input-group">
+                <input type="text" name="keyword" class="form-control" placeholder="พิมพ์ชื่อหรืออีเมล..." required>
+                <button class="btn btn-light" type="submit">ค้นหา</button>
+            </div>
+        </form>
+
+        {% if results %}
+        <div class="row g-3">
+            {% for member in results %}
+            <div class="col-12 col-md-6">
+                <div class="card text-white shadow-lg">
+                    <div class="card-body d-flex align-items-center">
+                        <img src="{{ url_for('static',filename='pic/VongolaySuit.png') }}" class="img-fluid me-3" style="width: 100px; height: 100px; object-fit: cover;" alt="{{ member.name }}">
+                        <div>
+                            <h5 class="card-title mb-1">{{ member.name }}</h5>
+                            <p class="card-text text-light small mb-2">{{ member.email }}</p>
+                            <a href="{{ member.link }}" class="btn btn-outline-light btn-sm" target="_blank">🔗 ดูเพิ่มเติม</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% elif request.method == 'POST' %}
+            <p class="text-center text-warning mt-4">ไม่พบข้อมูลที่ค้นหา</p>
+        {% endif %}
+    </div>
+
+    <!-- เอฟเฟกต์หิมะ -->
+    <script>
+        const canvas = document.getElementById('snow-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+
+        const snowflakes = [];
+
+        function createSnowflake() {
+            return {
+                x: Math.random() * width,
+                y: Math.random() * height,
+                radius: Math.random() * 3 + 1,
+                speedY: Math.random() * 1 + 0.5,
+                speedX: Math.random() * 0.5 - 0.25
+            };
+        }
+
+        for (let i = 0; i < 100; i++) {
+            snowflakes.push(createSnowflake());
+        }
+
+        function drawSnowflakes() {
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            for (const flake of snowflakes) {
+                ctx.moveTo(flake.x, flake.y);
+                ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
+            }
+            ctx.fill();
+            updateSnowflakes();
+            requestAnimationFrame(drawSnowflakes);
+        }
+
+        function updateSnowflakes() {
+            for (const flake of snowflakes) {
+                flake.y += flake.speedY;
+                flake.x += flake.speedX;
+                if (flake.y > height) {
+                    flake.y = 0;
+                    flake.x = Math.random() * width;
+                }
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        });
+
+        drawSnowflakes();
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
