@@ -1,5 +1,6 @@
 from flask import Flask, render_template, url_for, request, redirect, session, flash
 from tinydb import TinyDB, Query
+import re
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key'  # 🔐 ตั้งค่าสำหรับ session
@@ -57,17 +58,46 @@ def logout():
 def landing():
     return render_template("landing.html")
 
+def clean_name(name):
+    # ตัดช่องว่าง และอักขระพิเศษด้านหน้า
+    cleaned = name.strip()  # ลบช่องว่างหน้า-หลัง
+    cleaned = re.sub(r'^[^a-zA-Zก-๙]+', '', cleaned)  # ตัดอักขระนำหน้า
+    return cleaned.lower()
+
 @app.route('/member')
 def member():
     members = db.all()
-    # เรียงลำดับตามชื่อ (key: 'name') แบบไม่แคร์ว่าเป็นตัวใหญ่หรือตัวเล็ก
-    sorted_members = sorted(members, key=lambda x: x['name'].lower())
+
+    leaders = [m for m in members if '[ Leader ]' in m['name']]
+    others = [m for m in members if '[ Leader ]' not in m['name']]
+
+    leaders_sorted = sorted(leaders, key=lambda x: clean_name(x['name']))
+    others_sorted = sorted(others, key=lambda x: clean_name(x['name']))
+
+    sorted_members = leaders_sorted + others_sorted
+
     return render_template("index.html", members=sorted_members)
+
+
 
 @app.route('/sub-member')
 def sub_member():
     members = sub_member_db.all()
-    return render_template("sub_member.html", members=members)
+
+    # แยกตามกลุ่ม
+    leaders = [m for m in members if '[ Leader ]' in m['name']]
+    staffs = [m for m in members if '[ STAFF ]' in m['name'] and '[ Leader ]' not in m['name']]
+    others = [m for m in members if '[ Leader ]' not in m['name'] and '[ STAFF ]' not in m['name']]
+
+    # เรียงชื่อแต่ละกลุ่ม
+    leaders_sorted = sorted(leaders, key=lambda x: clean_name(x['name']))
+    staffs_sorted = sorted(staffs, key=lambda x: clean_name(x['name']))
+    others_sorted = sorted(others, key=lambda x: clean_name(x['name']))
+
+    # รวมลำดับ: Leader > Staff > อื่นๆ
+    sorted_members = leaders_sorted + staffs_sorted + others_sorted
+
+    return render_template("sub_member.html", members=sorted_members)
 
 # 🔐 หน้าผู้ดูแลระบบ
 @app.route('/admin', methods=['GET', 'POST'])
