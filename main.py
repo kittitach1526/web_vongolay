@@ -60,7 +60,9 @@ def landing():
 @app.route('/member')
 def member():
     members = db.all()
-    return render_template("index.html", members=members)
+    # เรียงลำดับตามชื่อ (key: 'name') แบบไม่แคร์ว่าเป็นตัวใหญ่หรือตัวเล็ก
+    sorted_members = sorted(members, key=lambda x: x['name'].lower())
+    return render_template("index.html", members=sorted_members)
 
 @app.route('/sub-member')
 def sub_member():
